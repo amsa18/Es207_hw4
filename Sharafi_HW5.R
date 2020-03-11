@@ -16,36 +16,33 @@ normalize <- function(x) {
   # Data visualization
   hist(log(normalize(x)))
   # nonparametric 95% interval estimates with quantile function and your method 
-  bstrap <- c()
-  # Do the iteration for making the vector of means samples. 
-  for (i in 1:1000){
-    bstrap <- c(bstrap, mean(sample(x, 8, replace = T)))
+  
+  #Creating a function will allow easier application of the same procedure later
+  np_median_int <- function(x){
+    set.seed(1) #This will keep your results consistent by keeping the random samples generated the same
+    bstrap <- c()
+    for (i in 1:1000){
+      bstrap <- c(bstrap, mean(sample(x, 8, replace = T)))
+    }
+    alfa <- 1-.95  
+    lo_np <- quantile(bstrap,alfa/2) #lower band 
+    up_np <- quantile(bstrap, 1-alfa/2) #upper band 
+    print(paste0("(", round(lo_np,3), ", ", round(up_np,3), ")"))
   }
-  alfa <- 1-.95  
-  lo_np <- quantile(bstrap,alfa/2) #lower band 
-  up_np <- quantile(bstrap, 1-alfa/2) #upper band 
-  print(paste0("(", round(lo_np,3), ", ", round(up_np,3), ")"))
-  # nonparametric 95% interval estimates with quantile function and your method 
-  bstrap <- c()
-  # Do the iteration for making the vector of means samples. 
-  for (i in 1:1000){
-    bstrap <- c(bstrap, mean(sample(x, 8, replace = T)))
-  }
-  alfa <- 1-.95  
-  lo_np <- quantile(bstrap,alfa/2) #lower band 
-  up_np <- quantile(bstrap, 1-alfa/2) #upper band 
-  print(paste0("(", round(lo_np,3), ", ", round(up_np,3), ")"))
+ np_median_int(x)
+  
   # parametric 95% interval estimates median
   #Natural log of x , the method is from book
-  y <- log(x)
-  me <- qt(0.975,length(y)-1)*sd(y)/sqrt(length(y))
-  lo_p_ln <- mean(y)-me #lower band 
-  up_p_ln <- mean(y)+me 
-  lo_p <- exp(lo_p_ln)
-  up_p <- exp(up_p_ln)
-  
-  print(paste0("For median","(", round(lo_p,3), ", ", round(up_p,3), ")"))
-  
+  p_median_int <- function(x){
+    y <- log(x)
+    me <- qt(0.975,length(y)-1)*sd(y)/sqrt(length(y))
+    lo_p_ln <- mean(y)-me #lower band 
+    up_p_ln <- mean(y)+me 
+    lo_p <- exp(lo_p_ln)
+    up_p <- exp(up_p_ln)
+    print(paste0("For median","(", round(lo_p,3), ", ", round(up_p,3), ")"))
+  }
+ p_median_int(x)
   
   # Parametric by using function 'predict'for mean
   CI <- predict(lm(x~1),
@@ -64,14 +61,8 @@ normalize <- function(x) {
   Flow <- na.omit(Con_river$`Flow (cfs)`)
   hist(log(normalize(Flow))) #plot normalized data
   # nonparametric 95% interval estimates median?
-  bstrap <- c()
-  for (i in 1:1000){
-    bstrap <- c(bstrap, mean(sample(Flow, 5, replace = T)))# create vector of means
-  }
-  alfa <- 1-.95
-  lo_np_4 <- quantile(bstrap,alfa/2) # lower band
-  up_np_4 <- quantile(bstrap, 1-alfa/2) #upper band
-  print(paste0("(", round(lo_np_4,3), ", ", round(up_np_4,3), ")"))
+  np_median_int(Flow)
+  
   #Asymmetric Confidence Interval for the mean
   # again use the natural log 
   y <- log(Flow) #make ln function
